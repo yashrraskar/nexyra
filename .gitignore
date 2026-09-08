@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Python environment
+.env
+
+# C/C++ executables
+*.exe
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
