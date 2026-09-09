@@ -1,0 +1,106 @@
+{
+  "id": "mahasync",
+  "realm": "mahasync",
+  "displayName": "MahaSync Identity & Access Platform",
+  "displayNameHtml": "<b>MahaSync</b> Interoperability Platform",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "roles": {
+    "realm": [
+      {
+        "name": "citizen",
+        "description": "Standard citizen profile with consent management privileges"
+      },
+      {
+        "name": "officer",
+        "description": "Government departmental verification officer"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "mahasync-frontend",
+      "name": "MahaSync Citizen Portal Web App",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["http://localhost:3000/*", "http://localhost:8082/*"],
+      "webOrigins": ["http://localhost:3000", "http://localhost:8082"],
+      "fullScopeAllowed": true
+    },
+    {
+      "clientId": "mahasync-backend",
+      "name": "MahaSync Orchestration API",
+      "enabled": true,
+      "bearerOnly": true,
+      "fullScopeAllowed": true
+    }
+  ],
+  "users": [
+    {
+      "id": "u-c001-rahul",
+      "username": "rahul",
+      "enabled": true,
+      "email": "rahul@mahasync.gov.in",
+      "firstName": "Rahul",
+      "lastName": "Patil",
+      "attributes": {
+        "citizen_id": ["C001"],
+        "phone": ["+919876543210"],
+        "state": ["Maharashtra"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "rahul123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["citizen"]
+    },
+    {
+      "id": "u-c002-amit",
+      "username": "amit",
+      "enabled": true,
+      "email": "amit@mahasync.gov.in",
+      "firstName": "Amit",
+      "lastName": "Deshmukh",
+      "attributes": {
+        "citizen_id": ["C002"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "amit123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["citizen"]
+    },
+    {
+      "id": "u-officer-01",
+      "username": "officer",
+      "enabled": true,
+      "email": "officer@mahasync.gov.in",
+      "firstName": "Sanjay",
+      "lastName": "Kulkarni",
+      "attributes": {
+        "department": ["Revenue"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "officer123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["officer"]
+    }
+  ]
+}

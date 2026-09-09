@@ -1,0 +1,84 @@
+version: "3.8"
+
+services:
+  # 1. Member 3: Revenue Department Mock API
+  revenue-api:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM python:3.11-slim
+        WORKDIR /app
+        COPY goverment_systems/revenue/requirements.txt .
+        RUN pip install --no-cache-dir -r requirements.txt
+        COPY goverment_systems/revenue/ /app/
+        EXPOSE 8000
+        CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+    container_name: mahasync-revenue-dept
+    ports:
+      - "8000:8000"
+    networks:
+      - mahasync-net
+
+  # 2. Member 3: Agriculture Department Mock API
+  agriculture-api:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM python:3.11-slim
+        WORKDIR /app
+        COPY goverment_systems/agriculture/requirements.txt .
+        RUN pip install --no-cache-dir -r requirements.txt
+        COPY goverment_systems/agriculture/ /app/
+        EXPOSE 8001
+        CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
+    container_name: mahasync-agri-dept
+    ports:
+      - "8001:8001"
+    networks:
+      - mahasync-net
+
+  # 3. Member 4: RabbitMQ Event Bus
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: mahasync-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+    environment:
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbitmq_management load_definitions "/etc/rabbitmq/definitions.json"
+    networks:
+      - mahasync-net
+
+  # 4. Member 2: MahaSync Interoperability Backend Core
+  mahasync-backend:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM python:3.11-slim
+        WORKDIR /app
+        COPY backend/requirements.txt .
+        RUN pip install --no-cache-dir -r requirements.txt
+        COPY . /app/
+        EXPOSE 8082
+        CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8082"]
+    container_name: mahasync-backend-core
+    environment:
+      REVENUE_API_URL: http://revenue-api:8000
+      AGRICULTURE_API_URL: http://agriculture-api:8001
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      BACKEND_PORT: 8082
+    ports:
+      - "8082:8082"
+    depends_on:
+      - revenue-api
+      - agriculture-api
+      - rabbitmq
+    networks:
+      - mahasync-net
+
+networks:
+  mahasync-net:
+    name: mahasync-network
+    driver: bridge

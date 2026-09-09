@@ -1,7 +1,11 @@
 import requests
 
-from revenue_adapter import convert_revenue_to_mahasync
-from agriculture_adapter import convert_mahasync_to_agriculture
+try:
+    from revenue_adapter import convert_revenue_to_mahasync
+    from agriculture_adapter import convert_mahasync_to_agriculture
+except ImportError:
+    from goverment_systems.adapters.revenue_adapter import convert_revenue_to_mahasync
+    from goverment_systems.adapters.agriculture_adapter import convert_mahasync_to_agriculture
 
 
 # 1. Get land record from Revenue Department
@@ -30,15 +34,11 @@ print(agriculture_data)
 
 
 # 4. Send verified data to Agriculture Department
+# Now accepting standardized agriculture_data directly thanks to flexible alias mapping
 response = requests.post(
     "http://127.0.0.1:8001/agriculture/verify-land",
-    json={
-        "citizen_id": mahasync_data["citizenId"],
-        "land_id": mahasync_data["landId"],
-        "area": mahasync_data["landArea"],
-        "verified": mahasync_data["verificationStatus"] == "VERIFIED"
-    }
+    json=agriculture_data
 )
 
 print("\n4. Agriculture Department Response:")
-print(response.json())
+print(response.json())
